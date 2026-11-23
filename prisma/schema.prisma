@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+enum PerfilUsuario {
+  ADMIN
+  OPERADOR
+}
+
+enum StatusProduto {
+  ATIVO
+  INATIVO
+}
+
+enum TipoMovimentacao {
+  ENTRADA
+  SAIDA
+  BAIXA
+}
+
+enum MotivoBaixa {
+  PERDA
+  AVARIA
+  EXTRAVIO
+  VENCIMENTO
+  OUTRO
+}
+
+model Usuario {
+  id                 String        @id @default(cuid())
+  nome               String
+  email              String        @unique
+  senhaHash          String        @map("senha_hash")
+  perfil             PerfilUsuario @default(OPERADOR)
+  ativo              Boolean       @default(true)
+  tokenVersao        Int           @default(0) @map("token_versao")
+  resetTokenHash     String?       @map("reset_token_hash")
+  resetTokenExpiraEm DateTime?     @map("reset_token_expira_em")
+  ultimoAcesso       DateTime?     @map("ultimo_acesso")
+  criadoEm           DateTime      @default(now()) @map("criado_em")
+  atualizadoEm       DateTime      @updatedAt @map("atualizado_em")
+
+  movimentacoes Movimentacao[]
+
+  @@map("usuarios")
+}
+
+model Produto {
+  id                String        @id @default(cuid())
+  nome              String
+  descricao         String?
+  categoria         String
+  sku               String        @unique
+  codigoBarras      String?       @unique @map("codigo_barras")
+  quantidadeEstoque Int           @default(0) @map("quantidade_estoque")
+  estoqueMinimo     Int           @default(0) @map("estoque_minimo")
+  precoCusto        Decimal       @map("preco_custo") @db.Decimal(10, 2)
+  precoVenda        Decimal       @map("preco_venda") @db.Decimal(10, 2)
+  status            StatusProduto @default(ATIVO)
+  criadoEm          DateTime      @default(now()) @map("criado_em")
+  atualizadoEm      DateTime      @updatedAt @map("atualizado_em")
+
+  movimentacoes Movimentacao[]
+
+  @@index([nome])
+  @@index([categoria])
+  @@index([status])
+  @@map("produtos")
+}
+
+model Movimentacao {
+  id             String           @id @default(cuid())
+  tipo           TipoMovimentacao
+  quantidade     Int
+  saldoAnterior  Int              @map("saldo_anterior")
+  saldoPosterior Int              @map("saldo_posterior")
+  motivoBaixa    MotivoBaixa?     @map("motivo_baixa")
+  observacao     String?
+  produtoId      String           @map("produto_id")
+  responsavelId  String           @map("responsavel_id")
+  criadoEm       DateTime         @default(now()) @map("criado_em")
+
+  produto     Produto @relation(fields: [produtoId], references: [id], onDelete: Restrict)
+  responsavel Usuario @relation(fields: [responsavelId], references: [id], onDelete: Restrict)
+
+  @@index([criadoEm])
+  @@index([produtoId])
+  @@index([tipo])
+  @@index([responsavelId])
+  @@map("movimentacoes")
+}
