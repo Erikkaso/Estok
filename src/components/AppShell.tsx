@@ -37,7 +37,12 @@ const NAV_ITEMS: NavItem[] = [
     matchPrefix: "/usuarios",
     adminOnly: true,
   },
-  { label: "Relatórios", href: "/relatorios", matchPrefix: "/relatorios" },
+  {
+    label: "Relatórios",
+    href: "/relatorios",
+    matchPrefix: "/relatorios",
+    adminOnly: true,
+  },
 ];
 
 export function AppShell({ user, children }: AppShellProps) {
@@ -138,10 +143,10 @@ export function AppShell({ user, children }: AppShellProps) {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden">
           <div
-            className="fixed inset-0 bg-slate-950/60"
+            className="modal-backdrop fixed inset-0 bg-slate-950/60"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="relative z-10 w-64 max-w-[80vw]">
+          <aside className="drawer-panel relative z-10 w-64 max-w-[80vw]">
             {sidebarContent}
           </aside>
         </div>

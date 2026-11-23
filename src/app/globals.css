@@ -17,3 +17,156 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+/* ---------- Motion (polimento; identidade visual inalterada) ---------- */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Só `from`: ao terminar não sobra transform (não quebra `position: fixed` dos filhos). */
+@keyframes enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes enter-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes enter-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@keyframes enter-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
+@keyframes grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Conteúdo de cada página entra suave ao navegar */
+main > * {
+  animation: enter-up 240ms var(--ease-out) backwards;
+}
+
+/* Cascata curta e não uniforme em grades de cards */
+.stagger > * {
+  animation: enter-up 300ms var(--ease-out) backwards;
+}
+.stagger > :nth-child(1) { animation-delay: 0ms; }
+.stagger > :nth-child(2) { animation-delay: 40ms; }
+.stagger > :nth-child(3) { animation-delay: 75ms; }
+.stagger > :nth-child(4) { animation-delay: 105ms; }
+.stagger > :nth-child(n + 5) { animation-delay: 130ms; }
+
+/* Barras dos gráficos crescem a partir da base / esquerda */
+.bar-grow {
+  transform-origin: bottom;
+  animation: grow-y 500ms var(--ease-out) backwards;
+}
+.bar-grow-x {
+  transform-origin: left;
+  animation: grow-x 600ms var(--ease-out) backwards;
+}
+
+.modal-backdrop {
+  animation: enter-fade 180ms ease-out backwards;
+}
+.modal-panel {
+  transform-origin: center;
+  animation: enter-scale 200ms var(--ease-out) backwards;
+}
+.drawer-panel {
+  animation: enter-left 260ms var(--ease-drawer) backwards;
+}
+.card-in {
+  animation: enter-up 360ms var(--ease-out) backwards;
+}
+
+/* Feedback de pressão em tudo que é clicável */
+button,
+a[class*="rounded"] {
+  transition-property: background-color, color, border-color, opacity, transform;
+  transition-duration: 150ms;
+  transition-timing-function: var(--ease-out);
+}
+button:not(:disabled):active,
+a[class*="bg-"]:active {
+  transform: scale(0.97);
+}
+
+/* Hover só onde existe hover de verdade (evita hover "preso" no toque) */
+@media (hover: hover) and (pointer: fine) {
+  .lift {
+    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+  }
+  .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px -8px rgb(15 23 42 / 0.18);
+  }
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  transition: box-shadow 150ms ease-out, border-color 150ms ease-out;
+}
+
+/* Movimento reduzido: mantém fades, remove deslocamento e escala */
+@media (prefers-reduced-motion: reduce) {
+  main > *,
+  .stagger > *,
+  .card-in,
+  .modal-panel,
+  .drawer-panel {
+    animation-name: enter-fade;
+  }
+  .bar-grow,
+  .bar-grow-x {
+    animation: none;
+  }
+  button:not(:disabled):active,
+  a[class*="bg-"]:active {
+    transform: none;
+  }
+  .lift:hover {
+    transform: none;
+  }
+}
+
+/* Impressão (PDF dos relatórios) */
+@media print {
+  aside,
+  header {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  .lg\:pl-60 {
+    padding-left: 0 !important;
+  }
+  main > *,
+  .stagger > *,
+  .bar-grow,
+  .bar-grow-x {
+    animation: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+}

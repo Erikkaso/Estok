@@ -120,8 +120,8 @@ async function DashboardContent() {
       </div>
 
       {/* KPI cards */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
+      <div className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="lift rounded-xl border border-slate-200 bg-white p-5">
           <p className="text-xs font-medium text-slate-500">Produtos ativos</p>
           <p className="mt-2 text-2xl font-bold text-slate-900">
             {formatIntegerBR(produtosAtivos.length)}
@@ -131,7 +131,7 @@ async function DashboardContent() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
+        <div className="lift rounded-xl border border-slate-200 bg-white p-5">
           <p className="text-xs font-medium text-slate-500">Itens em estoque</p>
           <p className="mt-2 text-2xl font-bold text-slate-900">
             {formatIntegerBR(totalItens)}
@@ -139,7 +139,7 @@ async function DashboardContent() {
           <p className="mt-1.5 text-xs text-slate-500">unidades disponíveis</p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
+        <div className="lift rounded-xl border border-slate-200 bg-white p-5">
           <p className="text-xs font-medium text-slate-500">Valor em estoque</p>
           <p className="mt-2 text-2xl font-bold text-slate-900">
             {isAdmin ? formatCurrencyCompactBRL(valorEstimado) : "Restrito"}
@@ -149,7 +149,7 @@ async function DashboardContent() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
+        <div className="lift rounded-xl border border-slate-200 bg-white p-5">
           <p className="text-xs font-medium text-slate-500">Saídas no mês</p>
           <p className="mt-2 text-2xl font-bold text-slate-900">
             {formatIntegerBR(saidasMes)}

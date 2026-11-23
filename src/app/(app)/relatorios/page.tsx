@@ -1,17 +1,16 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { PerfilUsuario } from "@prisma/client";
 import {
   RelatoriosClient,
   type RelatorioProduto,
 } from "@/components/RelatoriosClient";
-import { requirePageAuth } from "@/lib/auth";
+import { requireAdminPageAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 async function RelatoriosLoader() {
   await connection();
-  const user = await requirePageAuth();
-  const isAdmin = user.perfil === PerfilUsuario.ADMIN;
+  await requireAdminPageAuth();
+  const isAdmin = true;
 
   const rows = await prisma.produto.findMany({
     select: {

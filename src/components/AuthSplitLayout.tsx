@@ -32,7 +32,7 @@ export function AuthSplitLayout({
       </aside>
 
       <main className="flex flex-1 items-center justify-center bg-[#F8FAFC] px-6 py-12">
-        <div className="w-full max-w-[430px] rounded-2xl border border-slate-200 bg-white p-8 shadow-xs">
+        <div className="card-in w-full max-w-[430px] rounded-2xl border border-slate-200 bg-white p-8 shadow-xs">
           {children}
         </div>
       </main>

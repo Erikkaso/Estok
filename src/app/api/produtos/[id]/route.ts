@@ -106,9 +106,12 @@ export async function PATCH(
       sku,
       codigoBarras,
       estoqueMinimo,
-      precoVenda: precoVenda.toFixed(2),
       status,
     };
+
+    if (isAdmin) {
+      data.precoVenda = precoVenda.toFixed(2);
+    }
 
     if (isAdmin && body?.precoCusto !== undefined) {
       const precoCusto = Number(body.precoCusto);

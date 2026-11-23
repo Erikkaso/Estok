@@ -12,8 +12,13 @@ export interface SessionPayload {
 }
 
 function getJwtSecret(): Uint8Array {
-  const secret =
-    process.env.JWT_SECRET ?? "estok-dev-jwt-secret-change-in-production";
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("JWT_SECRET não configurado.");
+    }
+    return new TextEncoder().encode("estok-dev-jwt-secret-only-for-development");
+  }
   return new TextEncoder().encode(secret);
 }
 

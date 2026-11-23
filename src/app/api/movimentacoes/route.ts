@@ -7,6 +7,7 @@ import {
 } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireApiAuth } from "@/lib/auth";
+import { calcularSaldo } from "@/lib/estoque";
 
 export async function GET(request: NextRequest) {
   await connection();
@@ -152,20 +153,16 @@ export async function POST(request: NextRequest) {
         };
       }
 
-      const saldoAnterior = produto.quantidadeEstoque;
-      let saldoPosterior: number;
+      // Trava a linha: evita duas saídas simultâneas passarem do saldo.
+      const [{ quantidade_estoque: saldoAnterior }] = await tx.$queryRaw<
+        { quantidade_estoque: number }[]
+      >`SELECT quantidade_estoque FROM produtos WHERE id = ${produto.id} FOR UPDATE`;
 
-      if (tipo === TipoMovimentacao.ENTRADA) {
-        saldoPosterior = saldoAnterior + quantidade;
-      } else {
-        if (quantidade > saldoAnterior) {
-          return {
-            error: `Quantidade (${quantidade}) excede o saldo disponível (${saldoAnterior}).`,
-            status: 400 as const,
-          };
-        }
-        saldoPosterior = saldoAnterior - quantidade;
+      const calc = calcularSaldo(tipo, saldoAnterior, quantidade);
+      if (!calc.ok) {
+        return { error: calc.error, status: 400 as const };
       }
+      const saldoPosterior = calc.saldoPosterior;
 
       await tx.produto.update({
         where: { id: produto.id },
@@ -196,7 +193,7 @@ export async function POST(request: NextRequest) {
       });
 
       return { movimentacao };
-    });
+    }, { maxWait: 10_000, timeout: 15_000 });
 
     if ("error" in result) {
       return NextResponse.json(

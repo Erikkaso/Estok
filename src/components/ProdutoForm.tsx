@@ -74,9 +74,11 @@ export function ProdutoForm({ mode, isAdmin, initialData }: ProdutoFormProps) {
         sku,
         codigoBarras: codigoBarras || null,
         estoqueMinimo: Number(estoqueMinimo || 0),
-        precoVenda: Number(String(precoVenda || "0").replace(",", ".")),
         ...(isAdmin
           ? {
+              precoVenda: Number(
+                String(precoVenda || "0").replace(",", ".")
+              ),
               precoCusto: Number(
                 String(precoCusto || "0").replace(",", ".")
               ),
@@ -266,6 +268,7 @@ export function ProdutoForm({ mode, isAdmin, initialData }: ProdutoFormProps) {
                 </div>
               )}
 
+              {isAdmin && (
               <div>
                 <label
                   htmlFor="precoVenda"
@@ -285,7 +288,14 @@ export function ProdutoForm({ mode, isAdmin, initialData }: ProdutoFormProps) {
                   className="mt-1.5 w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1D4ED8] focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/20"
                 />
               </div>
+              )}
             </div>
+
+            {!isAdmin && (
+              <p className="mt-3 text-xs text-slate-500">
+                Preços são definidos apenas por administradores.
+              </p>
+            )}
 
             {mode === "edit" && initialData && (
               <p className="mt-3 text-xs text-slate-500">

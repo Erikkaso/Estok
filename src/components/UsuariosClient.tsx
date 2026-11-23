@@ -188,8 +188,8 @@ export function UsuariosClient({
 
       {/* Create user modal */}
       {modalAberto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+        <div className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+          <div className="modal-panel w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
             <h2 className="text-lg font-bold text-slate-900">Novo usuário</h2>
             <p className="mt-1 text-xs text-slate-500">
               Cadastre um membro para acessar o sistema Estok.

@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { formatCurrencyBRL } from "@/lib/format";
+import { baixarCsv, csvLinha } from "@/lib/csv";
+import { RelatorioMovimentacoes } from "@/components/RelatorioMovimentacoes";
 
 export interface RelatorioProduto {
   id: string;
@@ -38,43 +40,41 @@ export function RelatoriosClient({
   }, [produtos, filtro]);
 
   function exportarCsv() {
-    const headers = [
-      "Produto",
-      "Categoria",
-      "SKU",
-      "Estoque",
-      "Estoque Minimo",
-      ...(isAdmin ? ["Preco Custo"] : []),
-      "Preco Venda",
-      "Status",
-    ];
-    const rows = itens.map((p) => [
-      `"${p.nome.replace(/"/g, '""')}"`,
-      `"${p.categoria.replace(/"/g, '""')}"`,
-      p.sku,
-      String(p.quantidadeEstoque),
-      String(p.estoqueMinimo),
-      ...(isAdmin ? [String(p.precoCusto ?? 0)] : []),
-      String(p.precoVenda),
-      p.status,
+    baixarCsv("relatorio-estoque-estok.csv", [
+      csvLinha([
+        "Produto",
+        "Categoria",
+        "SKU",
+        "Estoque",
+        "Estoque Minimo",
+        ...(isAdmin ? ["Preco Custo"] : []),
+        "Preco Venda",
+        "Status",
+      ]),
+      ...itens.map((p) =>
+        csvLinha([
+          p.nome,
+          p.categoria,
+          p.sku,
+          p.quantidadeEstoque,
+          p.estoqueMinimo,
+          ...(isAdmin ? [p.precoCusto ?? 0] : []),
+          p.precoVenda,
+          p.status,
+        ])
+      ),
     ]);
-    const csv = [headers.join(";"), ...rows.map((r) => r.join(";"))].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "relatorio-estoque-estok.csv";
-    a.click();
-    URL.revokeObjectURL(url);
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mx-auto max-w-6xl space-y-10">
+      <RelatorioMovimentacoes />
+
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between print:hidden">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Relatórios
-          </h1>
+          <h2 className="text-lg font-bold text-slate-900">
+            Posição do estoque
+          </h2>
           <p className="mt-1 text-sm text-slate-500">
             Posição consolidada do estoque, itens para reposição e exportação
             CSV.
@@ -84,13 +84,13 @@ export function RelatoriosClient({
         <button
           type="button"
           onClick={exportarCsv}
-          className="inline-flex items-center justify-center rounded-lg bg-[#1D4ED8] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1E40AF]"
+          className="inline-flex items-center justify-center rounded-lg bg-[#1D4ED8] px-4 py-2.5 text-sm font-semibold text-white transition-[background-color,transform] duration-150 hover:bg-[#1E40AF] active:scale-[0.97]"
         >
           Exportar CSV
         </button>
       </div>
 
-      <div>
+      <div className="print:hidden">
         <select
           value={filtro}
           onChange={(e) => setFiltro(e.target.value)}

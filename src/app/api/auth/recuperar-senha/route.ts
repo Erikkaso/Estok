@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { enviarEmail } from "@/lib/email";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     const usuario = await prisma.usuario.findUnique({
       where: { email },
-      select: { id: true, ativo: true },
+      select: { id: true, ativo: true, nome: true },
     });
 
     let devResetUrl: string | undefined;
@@ -37,8 +38,20 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      if (process.env.NODE_ENV !== "production") {
-        devResetUrl = `/redefinir-senha?token=${token}`;
+      const path = `/redefinir-senha?token=${token}`;
+      const base = process.env.APP_URL ?? request.nextUrl.origin;
+      const enviado = await enviarEmail(
+        email,
+        "Estok — redefinição de senha",
+        `Olá, ${usuario.nome}.
+
+Para redefinir sua senha acesse (válido por 1 hora):
+${base}${path}
+
+Se não foi você, ignore este e-mail.`
+      );
+      if (!enviado && process.env.NODE_ENV !== "production") {
+        devResetUrl = path; // sem provedor de e-mail configurado: link só em desenvolvimento
       }
     }
 

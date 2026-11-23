@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         ? PerfilUsuario.ADMIN
         : PerfilUsuario.OPERADOR;
 
-    if (!nome || !email || senha.length < 6) {
+    if (!nome || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || senha.length < 6) {
       return NextResponse.json(
         {
           error:

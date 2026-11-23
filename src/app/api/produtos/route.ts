@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
         ? body.codigoBarras.trim()
         : null;
     const estoqueMinimo = Number(body?.estoqueMinimo ?? 0);
-    const precoVenda = Number(body?.precoVenda ?? 0);
+    const precoVenda = isAdmin ? Number(body?.precoVenda ?? 0) : 0;
     const precoCusto = isAdmin ? Number(body?.precoCusto ?? 0) : 0;
     const status =
       body?.status === StatusProduto.INATIVO
