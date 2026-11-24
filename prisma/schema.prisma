@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_URL_UNPOOLED")
+  provider = "sqlite"
+  url      = "file:./estok.db"
 }
 
 enum PerfilUsuario {
@@ -60,8 +59,8 @@ model Produto {
   codigoBarras      String?       @unique @map("codigo_barras")
   quantidadeEstoque Int           @default(0) @map("quantidade_estoque")
   estoqueMinimo     Int           @default(0) @map("estoque_minimo")
-  precoCusto        Decimal       @map("preco_custo") @db.Decimal(10, 2)
-  precoVenda        Decimal       @map("preco_venda") @db.Decimal(10, 2)
+  precoCusto        Decimal       @map("preco_custo")
+  precoVenda        Decimal       @map("preco_venda")
   status            StatusProduto @default(ATIVO)
   criadoEm          DateTime      @default(now()) @map("criado_em")
   atualizadoEm      DateTime      @updatedAt @map("atualizado_em")

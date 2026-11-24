@@ -24,10 +24,10 @@ export async function GET(request: NextRequest) {
       ...(q
         ? {
             OR: [
-              { nome: { contains: q, mode: "insensitive" } },
-              { sku: { contains: q, mode: "insensitive" } },
-              { codigoBarras: { contains: q, mode: "insensitive" } },
-              { categoria: { contains: q, mode: "insensitive" } },
+              { nome: { contains: q } },
+              { sku: { contains: q } },
+              { codigoBarras: { contains: q } },
+              { categoria: { contains: q } },
             ],
           }
         : {}),

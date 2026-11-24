@@ -8,14 +8,14 @@ Guia rápido para entender a organização do projeto, banco de dados, autentica
 
 ```text
 prisma/
-  schema.prisma        # Modelos, enums e conexão PostgreSQL (url + directUrl)
+  schema.prisma        # Modelos, enums e conexão SQLite (file:./estok.db)
   seed.ts              # Dados iniciais (ADMIN, OPERADOR, produtos e movimentações)
   migrations/          # Histórico SQL das migrations aplicadas
 
 src/
   proxy.ts             # Middleware (Next.js 16 Proxy): redireciona /login <-> /dashboard pelo cookie JWT
   lib/
-    prisma.ts          # Singleton do PrismaClient (usa DATABASE_URL pooled)
+    prisma.ts          # Singleton do PrismaClient (usa a conexão SQLite fixa do schema)
     jwt.ts             # Assinatura e verificação do JWT com `jose` (compatível com Edge/Proxy)
     auth.ts            # Leitura de sessão via banco (`tokenVersao` + `ativo`) e guards RBAC
     format.ts          # Formatação pt-BR (R$, inteiros, datas e último acesso)
@@ -59,7 +59,7 @@ src/
 
 ## 2. Banco de dados (`prisma/schema.prisma`)
 
-- **Conexão Neon:** `url` (`DATABASE_URL`, endpoint `-pooler`) atende a aplicação; `directUrl` (`DATABASE_URL_UNPOOLED`, endpoint direto) é usada pelo Prisma nas migrations.
+- **Conexão SQLite:** `url = "file:./estok.db"` fixa no `schema.prisma` (arquivo `prisma/estok.db` versionado).
 - **Enums:**
   - `PerfilUsuario`: `ADMIN`, `OPERADOR`
   - `StatusProduto`: `ATIVO`, `INATIVO`
@@ -77,7 +77,7 @@ src/
 1. **Login (`POST /api/auth/login`):** valida e-mail, senha (`bcryptjs`) e `ativo === true`; atualiza `ultimoAcesso`; assina um JWT HS256 (`sub`, `perfil`, `tokenVersao`) em `src/lib/jwt.ts` e grava no cookie `HttpOnly` `estok_token` (expira em 8h; `secure` segue HTTPS ou `x-forwarded-proto`).
 2. **Redirecionamento rápido (`src/proxy.ts`):** verifica apenas a assinatura do cookie para redirecionar rotas públicas (`/login`, `/recuperar-senha`, `/redefinir-senha`) e privadas sem abrir conexão com o banco.
 3. **Validação real no servidor (`src/lib/auth.ts`):**
-   - `getCurrentUser()` decodifica o cookie e busca o usuário no PostgreSQL, conferindo `usuario.ativo === true` e `usuario.tokenVersao === payload.tokenVersao`.
+   - `getCurrentUser()` decodifica o cookie e busca o usuário no SQLite, conferindo `usuario.ativo === true` e `usuario.tokenVersao === payload.tokenVersao`.
    - `POST /api/auth/logout` e a inativação de usuário (`PATCH /api/usuarios/[id]`) incrementam `tokenVersao`, **invalidando imediatamente** qualquer JWT emitido antes.
 4. **Regras por perfil:**
    - **Páginas:** `requirePageAuth()` protege todas as páginas em `src/app/(app)/`; `requireAdminPageAuth()` restringe `/usuarios` a `ADMIN`. O item `Usuários` também é ocultado na sidebar (`AppShell.tsx`) para `OPERADOR`.

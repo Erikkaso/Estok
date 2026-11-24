@@ -11,7 +11,7 @@
 - **Framework:** Next.js (App Router)
 - **Linguagem:** TypeScript
 - **Estilização:** Tailwind CSS
-- **ORM / Banco de Dados:** Prisma ORM + PostgreSQL
+- **ORM / Banco de Dados:** Prisma ORM + SQLite
 - **Autenticação:** JWT
 
 ---

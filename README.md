@@ -1,14 +1,14 @@
 # Estok
 
-Sistema de gerenciamento de estoque construído com **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, **Prisma ORM**, **PostgreSQL (Neon)** e autenticação **JWT**.
+Sistema de gerenciamento de estoque construído com **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, **Prisma ORM**, **SQLite** e autenticação **JWT**.
 
 ---
 
 ## Pré-requisitos
 
-- **Node.js** `>= 20` (ou `v21.7.2` como no ambiente atual; para `neon skills`, recomenda-se `>= 22.20`)
+- **Node.js** `>= 20` (ou `v21.7.2` como no ambiente atual)
 - **npm** `>= 10`
-- Banco **PostgreSQL** (local ou **Neon**)
+- Banco **SQLite** (arquivo `prisma/estok.db`, já versionado e populado)
 
 ---
 
@@ -30,27 +30,21 @@ Copie o arquivo `.env.example` para `.env`:
 cp .env.example .env
 ```
 
-Preencha as variáveis no `.env`:
+Preencha (opcional em dev) no `.env`:
 
 ```env
-# Conexão principal (pooled, usada pela aplicação em runtime)
-DATABASE_URL="postgresql://user:password@ep-example-pooler.region.aws.neon.tech/neondb?sslmode=require"
-
-# Conexão direta (sem -pooler, usada pelo Prisma para migrations)
-DATABASE_URL_UNPOOLED="postgresql://user:password@ep-example.region.aws.neon.tech/neondb?sslmode=require"
-
 # Segredo usado para assinar os tokens JWT (HS256)
 JWT_SECRET="alterar-para-uma-chave-secreta-segura"
 ```
 
-> **Dica (Neon):** se o projeto já estiver vinculado via `.neon`, você pode puxar `DATABASE_URL` e `DATABASE_URL_UNPOOLED` automaticamente com `neon env pull` (ou `neon.cmd env pull` no PowerShell).
+> A conexão com o banco é fixa em `prisma/schema.prisma` (`file:./estok.db`); não é necessário configurar `DATABASE_URL`.
 
 ### 3. Gerar o Prisma Client, aplicar migrations e rodar o seed
 
 ```bash
 npm run db:generate
-npx prisma migrate deploy
-npm run db:seed
+# o banco prisma/estok.db já vem populado no repositório;
+# para recriar do zero: npx prisma migrate reset
 ```
 
 - Para criar uma nova migration após alterar `prisma/schema.prisma`, use: `npm run db:migrate`.

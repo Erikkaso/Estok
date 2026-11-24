@@ -16,7 +16,7 @@ export async function GET() {
     return NextResponse.json({
       status: "ok",
       database: "connected",
-      branch: process.env.NEON_BRANCH ?? null,
+      provider: "sqlite",
       counts: {
         usuarios,
         produtos,
